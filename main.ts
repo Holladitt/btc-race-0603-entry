@@ -53,14 +53,14 @@ await runBars({
         if (TP1_BPS > 0 && !halfTaken && retBps >= TP1_BPS) {
           halfTaken = true;
           orders.push({ side: 'sell', symbol: 'CBBTC', qty: held.qty / 2n, max_slippage_bps: MAX_SLIP_BPS });
-        } else if (retBps >= tpNow || retBps <= -SL_BPS || (TS_BARS > 0 && devIdx - entryBar >= TS_BARS)) {
+        } else if (retBps >= tpNow || retBps <= -SL_BPS || (TS_BARS > 0 && state.seq - entryBar >= TS_BARS)) {
           orders.push({ side: 'sell', symbol: 'CBBTC', qty: held.qty, max_slippage_bps: MAX_SLIP_BPS });
         }
       }
       return orders;
     }
     if (state.warmingUp) return orders;
-    if (devIdx - lastExitBar < COOL_BARS) return orders;
+    if (state.seq - lastExitBar < COOL_BARS) return orders;
     const m = sma();
     if (m === null) return orders;
     const dipBps = ((close - m) / m) * 10000;
