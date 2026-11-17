@@ -49,7 +49,7 @@ await runBars({
     if (held !== undefined && held.qty > 0n) {
       if (entryPx > 0) {
         const retBps = ((close - entryPx) / entryPx) * 10000;
-        const tpNow = LATE_TP_BPS > 0 && devIdx >= LATE_BAR ? LATE_TP_BPS : TP_BPS;
+        const tpNow = LATE_TP_BPS > 0 && state.seq >= LATE_BAR ? LATE_TP_BPS : TP_BPS;
         if (TP1_BPS > 0 && !halfTaken && retBps >= TP1_BPS) {
           halfTaken = true;
           orders.push({ side: 'sell', symbol: 'CBBTC', qty: held.qty / 2n, max_slippage_bps: MAX_SLIP_BPS });
@@ -63,6 +63,7 @@ await runBars({
     if (state.seq - lastExitBar < COOL_BARS) return orders;
     const m = sma();
     if (m === null) return orders;
+    if (!Number.isFinite(close) || !Number.isFinite(m)) return orders;
     const dipBps = ((close - m) / m) * 10000;
     if (dipBps <= -DIP_BPS) {
       const notional = state.cash;
